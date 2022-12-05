@@ -28,6 +28,7 @@ const LoginMessage = ({ content }) => (
 const Login = (props) => {
   const { userLogin = {}, submitting } = props;
   const { status, type: loginType } = userLogin;
+  // 函数式编程: hook, 保存状态,函数外
   const [type, setType] = useState('account');
   const intl = useIntl();
 
@@ -70,11 +71,8 @@ const Login = (props) => {
             })}
           />
           <Tabs.TabPane
-            key="mobile"
-            tab={intl.formatMessage({
-              id: 'pages.login.phoneLogin.tab',
-              defaultMessage: '手机号登录',
-            })}
+            key="register"
+            tab="注册"
           />
         </Tabs>
 
@@ -138,7 +136,7 @@ const Login = (props) => {
         {status === 'error' && loginType === 'mobile' && !submitting && (
           <LoginMessage content="验证码错误" />
         )}
-        {type === 'mobile' && (
+        {/* {type === 'mobile' && (
           <>
             <ProFormText
               fieldProps={{
@@ -217,6 +215,67 @@ const Login = (props) => {
 
                 message.success('获取验证码成功！验证码为：1234');
               }}
+            />
+          </>
+        )} */}
+        {type === 'register' && (
+          <>
+            <ProFormText
+              fieldProps={{
+                size: 'large',
+                prefix: <UserOutlined className={styles.prefixIcon} />,
+              }}
+              name="username"
+              placeholder="请输入用户名"
+              rules={[
+                {
+                  required: true,
+                  message: "请输入用户名",
+                }
+              ]}
+            />
+            <ProFormText
+              fieldProps={{
+                size: 'large',
+                prefix: <MobileOutlined className={styles.prefixIcon} />,
+              }}
+              name="name"
+              placeholder="请输入姓名"
+              rules={[
+                {
+                  required: true,
+                  message: "请输入姓名",
+                }
+              ]}
+            />
+            <ProFormText
+              fieldProps={{
+                size: 'large',
+                prefix: <MobileOutlined className={styles.prefixIcon} />,
+              }}
+              name="email"
+              placeholder="请输入用户邮箱"
+              rules={[
+                {
+                  required: true,
+                  message: "请输入用户邮箱",
+                }
+              ]}
+            />
+            <ProFormText.Password
+              fieldProps={{
+                size: 'large',
+                prefix: <LockOutlined className={styles.prefixIcon} />,
+                type: 'password'
+              }}
+              name="password"
+              placeholder="请输入用户密码"
+              rules={[
+                {
+                  required: true,
+                  message: "请输入用户密码",
+                }
+              ]}
             />
           </>
         )}

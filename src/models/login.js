@@ -12,6 +12,20 @@ const Model = {
     status: undefined,
   },
   effects: {
+    *register({ payload }, { call, _ }) {
+      const response = yield call(register, {
+        username: payload.username,
+        password: payload.password,
+        name: payload.name,
+        email: payload.email,
+      });
+      if (response.code !== 0) {
+        message.error(response.msg);
+        return;
+      }
+      payload.setType('account');
+      message.success(response.msg);
+    },
     *login({ payload }, { call, put }) {
       // const response = yield call(fakeAccountLogin, payload);
       const response = yield call(login, payload); // call 调用外部异步方法
@@ -21,7 +35,7 @@ const Model = {
         payload: response,
       }); // Login successfully
 
-      if (response.code === 200) {
+      if (response.code === 0) {
         debugger;
         const urlParams = new URL(window.location.href);
         const params = getPageQuery();
