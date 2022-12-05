@@ -1,5 +1,7 @@
 // 嵌套routes, layout->page->component
 // path,component,authority,routes,icon,name
+// .. === /src
+// . 相对路径 /src/page
 export default [
   {
     path: '/',
