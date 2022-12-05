@@ -25,7 +25,7 @@ const Model = {
         debugger;
         const urlParams = new URL(window.location.href);
         const params = getPageQuery();
-        message.success('🎉 🎉 🎉  登录成功！');
+        message.success('🎉 🎉 🎉 🎉 登录成功！');
         let { redirect } = params;
 
         if (redirect) {
