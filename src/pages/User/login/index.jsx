@@ -37,10 +37,9 @@ const Login = (props) => {
     if (type === 'account') {
       dispatch({
         type: 'login/login',
-        payload: { username: values.username, passowrd: values.passowrd },
+        payload: { username: values.username, password: values.password },
       });
     } else {
-      debugger;
       dispatch({
         type: 'login/register',
         payload: { ...values, setType },
