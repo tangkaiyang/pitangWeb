@@ -38,6 +38,12 @@ export default [
                 component: './Welcome',
               },
               {
+                path: '/request',
+                name: '调试页面',
+                icon: 'rocket',
+                component: './Request'
+              },
+              {
                 path: '/admin',
                 name: 'admin',
                 icon: 'crown',
