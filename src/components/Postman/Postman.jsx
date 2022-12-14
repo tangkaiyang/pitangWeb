@@ -1,5 +1,5 @@
-import React from 'react';
-import { Card, Col, Row, Input, Select, Button, TabPane, Tabs } from 'antd';
+import React, { useState } from 'react';
+import { Card, Col, Row, Input, Select, Button, Tabs, Radio } from 'antd';
 import { SendOutlined } from '@ant-design/icons';
 // Col把栅格分成24份
 const { Option } = Select;
@@ -10,6 +10,9 @@ const selectBefore = (
   </Select>
 );
 export default () => {
+  // bodyType是变量名,setBodyType是改变bodyType的方法,none是bodyType默认值
+  const [bodyType, setBodyType] = useState('none');
+
   return (
     <Card>
       <Row gutter={[8, 8]}>
@@ -24,17 +27,38 @@ export default () => {
         </Col>
       </Row>
       <Row style={{ marginTop: 8 }}>
-        <Tabs defaultActiveKey="1">
-          <TabPane tab="Params" key="1">
-            这是Params
-          </TabPane>
-          <TabPane tab="Headers" key="2">
-            这是Headers
-          </TabPane>
-          <TabPane tab="Body" key="3">
-            这是Body
-          </TabPane>
-        </Tabs>
+        <Tabs
+          defaultActiveKey="1"
+          // onChange={onChange}
+          items={[
+            {
+              label: `Params`,
+              key: '1',
+              children: `这是Params`,
+            },
+            {
+              label: `Headers`,
+              key: '2',
+              children: `这是Headers`,
+            },
+            {
+              label: `Body`,
+              key: '3',
+              children: (
+                <Radio.Group value={bodyType} onChange={(e) => setBodyType(e.target.value)}>
+                  <Radio value="none">none</Radio>
+                  <Radio value="form-data">form-data</Radio>
+                  <Radio value="x-www-form-urlencoded">x-www-form-urlencoded</Radio>
+                  <Radio value="raw">raw</Radio>
+                  <Radio value="binary">binary</Radio>
+                  <Radio value="GraphQL">GraphQL</Radio>
+                </Radio.Group>
+                // {bodyType === 'raw' ?
+                // }
+              ),
+            },
+          ]}
+        />
       </Row>
     </Card>
   );
