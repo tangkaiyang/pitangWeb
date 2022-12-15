@@ -1,56 +1,75 @@
 import React, { useState } from 'react';
-import { Card, Col, Row, Input, Select, Button, Tabs, Radio } from 'antd';
+import { Card, Col, Row, Input, Select, Button, Tabs, Radio, Menu } from 'antd';
 import { SendOutlined } from '@ant-design/icons';
 import { DownOutlined, SmileOutlined } from '@ant-design/icons';
 import { Dropdown, Space } from 'antd';
 
-// Col把栅格分成24份
-const { Option } = Select;
-const selectBefore = (
-  <Select defaultValue="GET" className="select-before">
-    <Option value="GET">GET</Option>
-    <Option value="POST">POST</Option>
-  </Select>
-);
-
-const items = [
-  {
-    key: '1',
-    label: (
-      <a target="_blank" rel="noopener noreferrer" href="https://www.antgroup.com">
-        1st menu item
-      </a>
-    ),
-  },
-  {
-    key: '2',
-    label: (
-      <a target="_blank" rel="noopener noreferrer" href="https://www.aliyun.com">
-        2nd menu item (disabled)
-      </a>
-    ),
-    icon: <SmileOutlined />,
-    disabled: true,
-  },
-  {
-    key: '3',
-    label: (
-      <a target="_blank" rel="noopener noreferrer" href="https://www.luohanacademy.com">
-        3rd menu item (disabled)
-      </a>
-    ),
-    disabled: true,
-  },
-  {
-    key: '4',
-    danger: true,
-    label: 'a danger item',
-  },
-];
-
 export default () => {
+  // Col把栅格分成24份
+  const { Option } = Select;
+  const selectBefore = (
+    <Select defaultValue="GET" className="select-before">
+      <Option value="GET">GET</Option>
+      <Option value="POST">POST</Option>
+    </Select>
+  );
+
+  const onClickMenu = (key) => {
+    setRawType(key);
+  };
+
+  const menu = (
+    <Menu>
+      <Menu.Item key="Text">
+        <a
+          onClick={() => {
+            onClickMenu('Text');
+          }}
+        >
+          Text
+        </a>
+      </Menu.Item>
+      <Menu.Item key="JavaScript">
+        <a
+          onClick={() => {
+            onClickMenu('JavaScript');
+          }}
+        >
+          JavaScript
+        </a>
+      </Menu.Item>
+      <Menu.Item key="JSON">
+        <a
+          onClick={() => {
+            onClickMenu('JSON');
+          }}
+        >
+          JSON
+        </a>
+      </Menu.Item>
+      <Menu.Item key="HTML">
+        <a
+          onClick={() => {
+            onClickMenu('HTML');
+          }}
+        >
+          HTML
+        </a>
+      </Menu.Item>
+      <Menu.Item key="XML">
+        <a
+          onClick={() => {
+            onClickMenu('XML');
+          }}
+        >
+          XML
+        </a>
+      </Menu.Item>
+    </Menu>
+  );
   // bodyType是变量名,setBodyType是改变bodyType的方法,none是bodyType默认值
   const [bodyType, setBodyType] = useState('none');
+  const [rawType, setRawType] = useState('JSON');
 
   return (
     <Card>
@@ -97,16 +116,9 @@ export default () => {
           ]}
         />
         {bodyType === 'raw' ? (
-          <Dropdown
-            menu={{
-              items,
-            }}
-          >
+          <Dropdown style={{ marginLeft: 8 }} overlay={menu} trigger={['click']}>
             <a onClick={(e) => e.preventDefault()}>
-              <Space>
-                Hover me
-                <DownOutlined />
-              </Space>
+              {rawType} <DownOutlined />
             </a>
           </Dropdown>
         ) : null}
