@@ -115,8 +115,8 @@ export default () => {
             },
           ]}
         />
-        {bodyType === 'raw' ? (
-          <Dropdown style={{ marginLeft: 8 }} overlay={menu} trigger={['click']}>
+        {bodyType !== 'raw' ? (
+          <Dropdown style={{ marginLeft: 8}} overlay={menu} trigger={['click']}>
             <a onClick={(e) => e.preventDefault()}>
               {rawType} <DownOutlined />
             </a>
