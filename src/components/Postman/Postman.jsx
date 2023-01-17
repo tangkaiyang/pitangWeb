@@ -16,10 +16,14 @@ export default () => {
   const [bodyType, setBodyType] = useState('none');
   const [rawType, setRawType] = useState('JSON');
   // useState(初始值而不是变量名)
+  // params相关变量
   const [paramsData, setParamsData] = useState([]);
   const [editableKeys, setEditableRowKeys] = useState(() => {
     paramsData.map((item) => item.id);
   });
+  // headers相关变量
+  const [headers, setHeaders] = useState([]);
+  const [headersKeys, setHeadersKeys] = useState(() => headers.map((item) => item.id));
 
   const onClickMenu = (key) => {
     setRawType(key);
@@ -64,11 +68,17 @@ export default () => {
   };
 
   // 删除参数
-  const onDelete = (key) => {
-    const data = paramsData.filter((item) => item.id !== key);
-    setParamsData(data);
-    // 更新url
-    joinUrl(data);
+  const onDelete = (columnType, key) => {
+    if (columnType === `params`) {
+      const data = paramsData.filter((item) => item.id !== key);
+      setParamsData(data);
+      // 更新url
+      joinUrl(data);
+    } else {
+      // 更新headers
+      const data = headers.filter((item) => item.id !== key);
+      setHeaders(data);
+    }
   };
 
   const menu = (
@@ -121,35 +131,37 @@ export default () => {
     </Menu>
   );
 
-  const paramsColumns = [
-    {
-      title: 'KEY',
-      dataIndex: 'key',
-    },
-    {
-      title: 'VALUE',
-      dataIndex: 'value',
-    },
-    {
-      title: 'DESCRIPTION',
-      dataIndex: 'description',
-    },
-    {
-      title: '操作',
-      valueType: 'option',
-      width: 200,
-      render: (text, record) => [
-        <a
-          key="delete"
-          onClick={() => {
-            onDelete(record.id);
-          }}
-        >
-          删除
-        </a>,
-      ],
-    },
-  ];
+  const columns = (columnType) => {
+    return [
+      {
+        title: 'KEY',
+        dataIndex: 'key',
+      },
+      {
+        title: 'VALUE',
+        dataIndex: 'value',
+      },
+      {
+        title: 'DESCRIPTION',
+        dataIndex: 'description',
+      },
+      {
+        title: '操作',
+        valueType: 'option',
+        width: 200,
+        render: (text, record) => [
+          <a
+            key="delete"
+            onClick={() => {
+              onDelete(columnType, record.id);
+            }}
+          >
+            删除
+          </a>,
+        ],
+      },
+    ];
+  };
 
   return (
     <Card>
@@ -180,14 +192,13 @@ export default () => {
         <Col>
           <Tabs
             defaultActiveKey="1"
-            // onChange={onChange}
             items={[
               {
                 label: `Params`,
                 key: '1',
                 children: (
                   <EditableTable
-                    columns={paramsColumns}
+                    columns={columns(`params`)}
                     title="Query Params"
                     dataSource={paramsData}
                     setDataSource={setParamsData}
@@ -202,13 +213,12 @@ export default () => {
                 key: '2',
                 children: (
                   <EditableTable
-                    columns={paramsColumns}
+                    columns={columns('headers')}
                     title="Headers"
-                    dataSource={paramsData}
-                    setDataSource={setParamsData}
-                    extra={joinUrl}
-                    editableKeys={editableKeys}
-                    setEditableRowKeys={setEditableRowKeys}
+                    dataSource={headers}
+                    setDataSource={setHeaders}
+                    editableKeys={headersKeys}
+                    setEditableRowKeys={setHeadersKeys}
                   />
                 ),
               },

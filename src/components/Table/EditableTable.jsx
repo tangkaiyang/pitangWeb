@@ -33,7 +33,9 @@ export default ({
           return [defaultDoms.delete];
         },
         onValuesChange: (record, recordList) => {
-          extra(recordList);
+          if (extra) {
+            extra(recordList);
+          }
           setDataSource(recordList);
         },
         onChange: setEditableRowKeys,
