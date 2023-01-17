@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
-import { Card, Col, Row, Input, Select, Button, Tabs, Radio, Menu } from 'antd';
-import { DeleteTwoTone, SendOutlined } from '@ant-design/icons';
-import { DownOutlined, SmileOutlined } from '@ant-design/icons';
-import { Dropdown, Space } from 'antd';
+import { Card, Col, Row, Input, Select, Button, Tabs, Radio, Menu, Dropdown } from 'antd';
+import { SendOutlined, DownOutlined } from '@ant-design/icons';
 import EditableTable from '@/components/Table/EditableTable';
 
 // Col把栅格分成24份
@@ -37,9 +35,9 @@ export default () => {
       // 如果item.key有效
       if (item.key) {
         if (idx === 0) {
-          tempUrl = `${tempUrl}?${item.key}=${item.value || ''}}`;
+          tempUrl = `${tempUrl}?${item.key}=${item.value || ''}`;
         } else {
-          tempUrl = `${tempUrl}&${item.key}=${item.value || ''}}`;
+          tempUrl = `${tempUrl}&${item.key}=${item.value || ''}`;
         }
       }
     });
@@ -56,13 +54,21 @@ export default () => {
       const keys = [];
       params.forEach((item, idx) => {
         const [key, value] = item.split('=');
-        const now = Data.now();
+        const now = Date.now();
         keys.push(now + idx + 10);
         newParams.push({ key, value, id: now + idx + 10, description: '' });
       });
       setParamsData(newParams);
       setEditableRowKeys(keys);
     }
+  };
+
+  // 删除参数
+  const onDelete = (key) => {
+    const data = paramsData.filter((item) => item.id !== key);
+    setParamsData(data);
+    // 更新url
+    joinUrl(data);
   };
 
   const menu = (
@@ -131,31 +137,37 @@ export default () => {
     {
       title: '操作',
       valueType: 'option',
-      width: 250,
-      render: () => {
-        return null;
-      },
+      width: 200,
+      render: (text, record) => [
+        <a
+          key="delete"
+          onClick={() => {
+            onDelete(record.id);
+          }}
+        >
+          删除
+        </a>,
+      ],
     },
-    // {
-    //   title: '操作',
-    //   render: (text, record) => {
-    //     return (
-    //       <DeleteTwoTone
-    //         style={{ cursor: 'pointer' }}
-    //         onClick={() => {
-    //           onDelete(record.id);
-    //         }}
-    //       />
-    //     );
-    //   },
-    // },
   ];
 
   return (
     <Card>
       <Row gutter={[8, 8]}>
         <Col span={18}>
-          <Input size="large" addonBefore={selectBefore} defaultValue="mysite" />
+          <Input
+            size="large"
+            addonBefore={selectBefore}
+            placeholder="请输入要请求的url"
+            // 绑定值才能更新QAQ
+            value={url}
+            // defaultValue={() => "http://baidu.com?a=1&b=2"}
+            // 用标签的值更新
+            onChange={(e) => {
+              setUrl(e.target.value);
+              splitUrl(e.target.value);
+            }}
+          />
         </Col>
         <Col span={6}>
           <Button type="primary" size="large" style={{ marginRight: 16, float: 'right' }}>
