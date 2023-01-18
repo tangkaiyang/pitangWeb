@@ -1,16 +1,26 @@
 import React, { useState } from 'react';
-import { Card, Col, Row, Input, Select, Button, Tabs, Radio, Menu, Dropdown } from 'antd';
+import {
+  Card,
+  Col,
+  Row,
+  Input,
+  Select,
+  Button,
+  Tabs,
+  Radio,
+  Menu,
+  Dropdown,
+  notification,
+  Modal,
+} from 'antd';
 import { SendOutlined, DownOutlined } from '@ant-design/icons';
 import EditableTable from '@/components/Table/EditableTable';
+import CodeEditor from './CodeEditor';
+import { httpRequest } from '@/services/request';
 
 // Col把栅格分成24份
 const { Option } = Select;
-const selectBefore = (
-  <Select defaultValue="GET" className="select-before">
-    <Option value="GET">GET</Option>
-    <Option value="POST">POST</Option>
-  </Select>
-);
+
 export default () => {
   // bodyType是变量名,setBodyType是改变bodyType的方法,none是bodyType默认值
   const [bodyType, setBodyType] = useState('none');
@@ -162,6 +172,64 @@ export default () => {
       },
     ];
   };
+  // 处理headers,转成map
+  const getHeaders = () => {
+    const result = {};
+    headers.forEach((item) => {
+      if (item.key !== '') {
+        result[item.key] = item.value;
+      }
+    });
+    return result;
+  };
+  // 请求方法select框改为受控
+  const [method, setMethod] = useState('GET');
+
+  const selectBefore = (
+    <Select value={method} onChange={(data) => setMethod(data)} className="select-before">
+      <Option value="GET">GET</Option>
+      <Option value="POST">POST</Option>
+    </Select>
+  );
+  const [body, setBody] = useState(null);
+  // 请求的loading状态
+  const [loading, setLoading] = useState(false);
+  // 返回值
+  const [response, setResponse] = useState({});
+  // 拼接request请求
+  const onRequest = async () => {
+    if (url === '') {
+      notification.error({ message: '请求url不能为空' });
+    }
+    setLoading(true);
+    const params = {
+      method,
+      url,
+      body,
+      headers: getHeaders(),
+    };
+
+    if (bodyType === null) {
+      params.body = null;
+    }
+    const response = await httpRequest(params);
+    setLoading(false);
+    if (response.code !== 0) {
+      notification.error(response.message);
+      return;
+    }
+    setResponse(response.data);
+    Modal.info({
+      title: '返回结果',
+      content: (
+        <pre>
+          {typeof response.data.response === 'string'
+            ? response.data.response
+            : JSON.stringify(response.data.response, null, 2)}
+        </pre>
+      ),
+    });
+  };
 
   return (
     <Card>
@@ -182,7 +250,13 @@ export default () => {
           />
         </Col>
         <Col span={6}>
-          <Button type="primary" size="large" style={{ marginRight: 16, float: 'right' }}>
+          <Button
+            onClick={onRequest}
+            loading={loading}
+            type="primary"
+            size="large"
+            style={{ marginRight: 16, float: 'right' }}
+          >
             <SendOutlined />
             Send
           </Button>
@@ -226,23 +300,35 @@ export default () => {
                 label: `Body`,
                 key: '3',
                 children: (
-                  <Row>
-                    <Radio.Group value={bodyType} onChange={(e) => setBodyType(e.target.value)}>
-                      <Radio value="none">none</Radio>
-                      <Radio value="form-data">form-data</Radio>
-                      <Radio value="x-www-form-urlencoded">x-www-form-urlencoded</Radio>
-                      <Radio value="raw">raw</Radio>
-                      <Radio value="binary">binary</Radio>
-                      <Radio value="GraphQL">GraphQL</Radio>
-                    </Radio.Group>
+                  <>
+                    <Row>
+                      <Radio.Group value={bodyType} onChange={(e) => setBodyType(e.target.value)}>
+                        <Radio value="none">none</Radio>
+                        <Radio value="form-data">form-data</Radio>
+                        <Radio value="x-www-form-urlencoded">x-www-form-urlencoded</Radio>
+                        <Radio value="raw">raw</Radio>
+                        <Radio value="binary">binary</Radio>
+                        <Radio value="GraphQL">GraphQL</Radio>
+                      </Radio.Group>
+                      {bodyType === 'raw' ? (
+                        <Dropdown style={{ marginLeft: 8 }} overlay={menu} trigger={['click']}>
+                          <a onClick={(e) => e.preventDefault()}>
+                            {rawType} <DownOutlined />
+                          </a>
+                        </Dropdown>
+                      ) : null}
+                    </Row>
                     {bodyType === 'raw' ? (
-                      <Dropdown style={{ marginLeft: 8 }} overlay={menu} trigger={['click']}>
-                        <a onClick={(e) => e.preventDefault()}>
-                          {rawType} <DownOutlined />
-                        </a>
-                      </Dropdown>
+                      <Row style={{ marginTop: 12 }}>
+                        <Col span={24}>
+                          <Card bodyStyle={{ padding: 0 }}>
+                            {/* 注意入参!!! */}
+                            <CodeEditor value={body} setValue={setBody} theme="vs-dark" />
+                          </Card>
+                        </Col>
+                      </Row>
                     ) : null}
-                  </Row>
+                  </>
                 ),
               },
             ]}
