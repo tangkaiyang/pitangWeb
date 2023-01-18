@@ -2,14 +2,14 @@ import React from 'react';
 import Editor from '@monaco-editor/react';
 
 export default ({ language, value, setValue, height, theme }) => {
-  const handleEditorChange = (value, event) => {
-    setValue(value);
+  const handleEditorChange = (data) => {
+    setValue(data);
   };
   return (
     <Editor
-      height={height || '50vh'}
+      height={height || '20vh'}
       defaultLanguage={language || 'json'}
-      defaultValue=""
+      value={value}
       theme={theme || 'light'}
       onChange={handleEditorChange}
     />

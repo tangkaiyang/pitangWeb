@@ -12,11 +12,13 @@ import {
   Dropdown,
   notification,
   Modal,
+  Table,
 } from 'antd';
 import { SendOutlined, DownOutlined } from '@ant-design/icons';
 import EditableTable from '@/components/Table/EditableTable';
 import CodeEditor from './CodeEditor';
 import { httpRequest } from '@/services/request';
+import { Field } from 'rc-field-form';
 
 // Col把栅格分成24份
 const { Option } = Select;
@@ -212,23 +214,59 @@ export default () => {
     if (bodyType === null) {
       params.body = null;
     }
-    const response = await httpRequest(params);
+    const res = await httpRequest(params);
     setLoading(false);
-    if (response.code !== 0) {
-      notification.error(response.message);
+    if (res.code !== 0) {
+      notification.error(res.data.msg || '网络开小差了');
       return;
     }
-    setResponse(response.data);
+    setResponse(res.data);
     Modal.info({
       title: '返回结果',
       content: (
         <pre>
-          {typeof response.data.response === 'string'
-            ? response.data.response
-            : JSON.stringify(response.data.response, null, 2)}
+          {typeof res.data.response === 'string'
+            ? res.data.response
+            : JSON.stringify(res.data.response, null, 2)}
         </pre>
       ),
     });
+  };
+
+  // http状态码组件
+  const STATUS = {
+    200: { color: '#67C23A', text: 'OK' },
+    401: { color: '#F56C6C', text: 'unauthorized' },
+  };
+
+  const tabExtra = (response) => {
+    return response ? (
+      <div style={{ marginRight: 16 }}>
+        <span>
+          Status:
+          <span
+            style={{ color: STATUS[response.status_code].color, marginLeft: 8, marginRight: 8 }}
+          >
+            {response.status_code} {STATUS[response.status_code].text}
+          </span>
+          <span style={{ marginLeft: 8, marginRight: 8 }}>
+            Time: <span style={{ color: '#67C23A' }}>{response.elapsed}</span>
+          </span>
+        </span>
+      </div>
+    ) : null;
+  };
+
+  const resColumns = [
+    { title: 'KEY', dataIndex: 'key', key: 'key' },
+    { title: 'VALUE', dataIndex: 'value', key: 'value' },
+  ];
+
+  const toTable = (field) => {
+    if (!response[field]) {
+      return [];
+    }
+    return Object.keys(response[field]).map((key) => ({ key, value: response[field][key] }));
   };
 
   return (
@@ -318,22 +356,70 @@ export default () => {
                         </Dropdown>
                       ) : null}
                     </Row>
-                    {bodyType === 'raw' ? (
+                    {bodyType !== 'none' ? (
                       <Row style={{ marginTop: 12 }}>
                         <Col span={24}>
                           <Card bodyStyle={{ padding: 0 }}>
                             {/* 注意入参!!! */}
-                            <CodeEditor value={body} setValue={setBody} theme="vs-dark" />
+                            <CodeEditor value={body} setValue={setBody} height="20vh" />
                           </Card>
                         </Col>
                       </Row>
-                    ) : null}
+                    ) : (
+                      <div style={{ height: '20vh', lineHeight: '20vh', textAlign: 'center' }}>
+                        This request does not have a body
+                      </div>
+                    )}
                   </>
                 ),
               },
             ]}
           />
         </Col>
+      </Row>
+      <Row gutter={[8, 8]}>
+        {Object.keys(response).length === 0 ? null : (
+          <Tabs
+            style={{ width: '100%' }}
+            tabBarExtraContent={tabExtra(response)}
+            items={[
+              {
+                label: 'Body',
+                key: '1',
+                children: (
+                  <CodeEditor
+                    value={response.response ? JSON.stringify(response.response, null, 2) : ''}
+                    height="30vh"
+                  />
+                ),
+              },
+              {
+                label: 'Cookie',
+                key: '2',
+                children: (
+                  <Table
+                    columns={resColumns}
+                    dataSource={toTable('cookies')}
+                    size="small"
+                    pagination={false}
+                  />
+                ),
+              },
+              {
+                label: 'Headers',
+                key: '3',
+                children: (
+                  <Table
+                    columns={resColumns}
+                    dataSource={toTable('response_header')}
+                    size="small"
+                    pagination={false}
+                  />
+                ),
+              },
+            ]}
+          />
+        )}
       </Row>
     </Card>
   );
