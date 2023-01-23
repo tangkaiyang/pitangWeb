@@ -19,6 +19,7 @@ import EditableTable from '@/components/Table/EditableTable';
 import CodeEditor from './CodeEditor';
 import { httpRequest } from '@/services/request';
 import { Field } from 'rc-field-form';
+import auth from '@/utils/auth';
 
 // Col把栅格分成24份
 const { Option } = Select;
@@ -217,10 +218,12 @@ export default () => {
     const res = await httpRequest(params);
     setLoading(false);
     if (res.code !== 0) {
-      notification.error(res.data.msg || '网络开小差了');
+      notification.error(res.msg || '网络开小差了');
       return;
     }
-    setResponse(res.data);
+    if (auth.response(res, true)) {
+      setResponse(res.data);
+    }
     Modal.info({
       title: '返回结果',
       content: (
