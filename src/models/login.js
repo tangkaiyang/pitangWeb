@@ -36,7 +36,6 @@ const Model = {
       }); // Login successfully
 
       if (response.code === 0) {
-        debugger;
         const urlParams = new URL(window.location.href);
         const params = getPageQuery();
         message.success('🎉 🎉 🎉 🎉 登录成功！');

@@ -41,7 +41,13 @@ export default [
                 path: '/request',
                 name: '调试页面',
                 icon: 'rocket',
-                component: './Request'
+                component: './Request',
+              },
+              {
+                path: '/project',
+                name: '项目管理',
+                icon: 'book',
+                component: './Project',
               },
               {
                 path: '/admin',

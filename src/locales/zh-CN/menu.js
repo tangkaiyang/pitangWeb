@@ -49,5 +49,6 @@ export default {
   'menu.editor.flow': '流程编辑器',
   'menu.editor.mind': '脑图编辑器',
   'menu.editor.koni': '拓扑编辑器',
-  'menu.调试页面': '调试页面'
+  'menu.调试页面': '调试页面',
+  'menu.项目管理': '项目管理',
 };

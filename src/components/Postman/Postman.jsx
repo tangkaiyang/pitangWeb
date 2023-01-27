@@ -18,7 +18,6 @@ import { SendOutlined, DownOutlined } from '@ant-design/icons';
 import EditableTable from '@/components/Table/EditableTable';
 import CodeEditor from './CodeEditor';
 import { httpRequest } from '@/services/request';
-import { Field } from 'rc-field-form';
 import auth from '@/utils/auth';
 
 // Col把栅格分成24份
