@@ -8,6 +8,7 @@ import { listProject, insertProject } from '@/services/project';
 import { Button, Row, Select, Tooltip, Col, Input, Spin, Card, Empty, Popover, Avatar } from 'antd';
 import { QuestionOutlined } from '@ant-design/icons';
 import { history } from 'umi';
+import FormForModal from '@/components/PitangForm/FormForModal';
 const { Option } = Select;
 const { Search } = Input;
 export default () => {
@@ -29,7 +30,7 @@ export default () => {
   // 分页
   const [pagination, setPagination] = useState({ current: 1, size: 8, total: 0 });
   // 创建项目弹窗是否可见
-  const [visible, setvisible] = useState(false);
+  const [visible, setVisible] = useState(false);
   // 项目管理员
   const [uses, setUsers] = useState({});
 
@@ -46,9 +47,19 @@ export default () => {
       }
     });
   };
-  useEffect(async () => {
-    await fetchData();
-  }, []);
+  useEffect(() => {
+    async function fetchData(current = pagination.current, size = pagination.size) {
+      await process(async () => {
+        const res = await listProject({ page: current, size });
+        if (auth.response(res)) {
+          setData(res.data);
+          setPagination({ ...pagination, total: res.total });
+        }
+        return;
+      });
+    }
+    fetchData();
+  }, [pagination]);
 
   // 项目搜索
   const onSearchProject = async (projectName) => {
@@ -64,12 +75,14 @@ export default () => {
   const onHandleCreate = async (values) => {
     const res = await insertProject(values);
     if (auth.response(res, true)) {
+      setVisible(false);
       await fetchData(1);
     }
   };
   const content = (item) => {
     return (
       <div>
+        {/* <p>负责人:{users[item.owner].name}</p> */}
         <p>简介:{item.description || '无'}</p>
         <p>更新时间:{item.updated_at}</p>
       </div>
@@ -120,13 +133,21 @@ export default () => {
   ];
   return (
     <PageContainer title={false}>
-      {/* <FormForModal width={600} title="添加项目" left={6} right={18} record={{}}
-                      visible={visible} onCancel={() => setVisible(false)} fields={fields} onFinish={onHandleCreate}
-        /> */}
+      <FormForModal
+        width={600}
+        title="添加项目"
+        left={6}
+        right={18}
+        record={{}}
+        visible={visible}
+        onCancel={() => setVisible(false)}
+        fields={fields}
+        onFinish={onHandleCreate}
+      />
       {/* 24等分 */}
       <Row gutter={8} style={{ marginBottom: 16 }}>
         <Col span={18}>
-          <Button type="primary" onClick={() => setvisible(true)}>
+          <Button type="primary" onClick={() => setVisible(true)}>
             创建项目
             <Tooltip title="只有超级管理员可以创建项目">
               <QuestionOutlined />
