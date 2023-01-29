@@ -5,6 +5,7 @@ const UserModel = {
     currentUser: {},
   },
   effects: {
+    // 生成器
     *fetch(_, { call, put }) {
       const response = yield call(queryUsers);
       yield put({
