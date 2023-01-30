@@ -1,5 +1,6 @@
 import auth from '@/utils/auth';
 import request from '@/utils/request';
+import { CONFIG } from '@/consts/config';
 export async function query() {
   return request('/api/users');
 }

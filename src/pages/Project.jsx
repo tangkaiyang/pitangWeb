@@ -9,6 +9,7 @@ import { Button, Row, Select, Tooltip, Col, Input, Spin, Card, Empty, Popover, A
 import { QuestionOutlined } from '@ant-design/icons';
 import { history } from 'umi';
 import FormForModal from '@/components/PitangForm/FormForModal';
+import { listUsers } from '@/services/user';
 const { Option } = Select;
 const { Search } = Input;
 
@@ -20,23 +21,35 @@ export default () => {
   // 创建项目弹窗是否可见
   const [visible, setVisible] = useState(false);
   // 项目管理员
-  const [uses, setUsers] = useState({});
+  const [users, setUsers] = useState({});
 
   // 方法
   // 获取数据
   // useEffect在mount或view更新都会执行,因此会无限循环,故传第二参数[]仅在mount时执行
   // [pagination]在pagination变化时更新
   const fetchData = async (current = pagination.current, size = pagination.size) => {
-    // await process(async () => {
-    const res = await listProject({ page: current, size });
-    if (auth.response(res)) {
-      setData(res.data);
-      setPagination({ ...pagination, total: res.total });
-    }
-    // });
+    await process(async () => {
+      const res = await listProject({ page: current, size });
+      if (auth.response(res)) {
+        setData(res.data);
+        setPagination({ ...pagination, total: res.total });
+      }
+    });
   };
   useEffect(async () => {
     await fetchData();
+  }, []);
+
+  const fetchUsers = async () => {
+    await process(async () => {
+      const res = await listUsers();
+      if (auth.response(res)) {
+        setUsers(res.data);
+      }
+    });
+  };
+  useEffect(async () => {
+    await fetchUsers();
   }, []);
 
   // 项目搜索
@@ -66,7 +79,7 @@ export default () => {
       </div>
     );
   };
-  const users = [];
+  // const users = [];
   const opt = (
     <Select placeholder="请选择项目负责人">
       {Object.keys(users).map((id) => (
@@ -78,7 +91,7 @@ export default () => {
   );
   const fields = [
     {
-      name: 'projectName',
+      name: 'name',
       label: '项目名称',
       required: true,
       message: '请输入项目名称',
