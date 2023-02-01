@@ -22,7 +22,6 @@ export default () => {
   const [visible, setVisible] = useState(false);
   // 项目管理员
   const [users, setUsers] = useState({});
-
   // 方法
   // 获取数据
   // useEffect在mount或view更新都会执行,因此会无限循环,故传第二参数[]仅在mount时执行
