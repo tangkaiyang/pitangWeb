@@ -3,8 +3,9 @@ import { CONFIG } from '@/consts/config';
 import auth from '@/utils/auth';
 
 export async function listProject(params) {
-  return request(`${CONFIG.URL}/project/list?page=${params.page}&size=${params.size}&name=${params.name||''}`, {
+  return request(`${CONFIG.URL}/project/list`, {
     method: 'GET',
+    params: params,
     headers: auth.headers(),
   });
 }
