@@ -47,7 +47,12 @@ export default [
                 path: '/project',
                 name: '项目管理',
                 icon: 'book',
-                component: './Project',
+                component: './Project/Project',
+              },
+              {
+                path: '/project/:id',
+                hideInMenu: true,
+                component: './Project/ProjectDetail',
               },
               {
                 path: '/admin',
