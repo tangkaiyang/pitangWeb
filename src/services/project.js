@@ -16,3 +16,11 @@ export async function insertProject(params) {
     headers: auth.headers(),
   });
 }
+
+export async function queryProject(params) {
+  return request(`${CONFIG.URL}/project/${params.projectId}`, {
+    method: 'GET',
+    params: params,
+    headers: auth.headers(),
+  });
+}
