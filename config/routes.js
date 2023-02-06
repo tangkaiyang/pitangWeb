@@ -52,7 +52,7 @@ export default [
               {
                 path: '/project/:id',
                 hideInMenu: true,
-                component: './Project/ProjectDetail',
+                component: '../components/Project/ProjectDetail',
               },
               {
                 path: '/admin',
