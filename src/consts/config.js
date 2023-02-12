@@ -5,4 +5,5 @@ export const CONFIG = {
     1: 'admin',
     2: 'superAdmin',
   },
+  PROJECT_ROLE_MAP: {},
 };

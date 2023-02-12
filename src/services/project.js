@@ -9,10 +9,10 @@ export async function listProject(params) {
     headers: auth.headers(),
   });
 }
-export async function insertProject(params) {
+export async function insertProject(data) {
   return request(`${CONFIG.URL}/project/insert`, {
     method: 'POST',
-    data: params,
+    data,
     headers: auth.headers(),
   });
 }
@@ -24,10 +24,26 @@ export async function queryProject(params) {
     headers: auth.headers(),
   });
 }
-export async function updateProject(params) {
+export async function updateProject(data) {
   return request(`${CONFIG.URL}/project/update`, {
     method: 'POST',
-    data: params,
+    data,
+    headers: auth.headers(),
+  });
+}
+
+export async function insertProjectRole(data) {
+  return request(`${CONFIG.URL}/project/role/insert`, {
+    method: 'POST',
+    data,
+    headers: auth.headers(),
+  });
+}
+
+export async function updateProjectRole(data) {
+  return request(`${CONFIG.URL}/project/role/update`, {
+    method: 'POST',
+    data,
     headers: auth.headers(),
   });
 }
