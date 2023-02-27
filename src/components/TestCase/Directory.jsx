@@ -1,15 +1,29 @@
-import { Spin, Row, Col, Card, Dropdown, Menu } from 'antd';
+import { Spin, Row, Col, Card, Dropdown, Menu, Button } from 'antd';
 import React, { useState } from 'react';
 import ProfessionalTree from '@/components/Tree/ProfessionalTree';
 import { PlusOutlined, FolderTwoTone, BugTwoTone, FolderOutlined } from '@ant-design/icons';
+import PostForm from '@/components/TestCase/PostForm';
 
 export default ({ loading, treeData }) => {
   const [searchValue, setSearchValue] = useState('');
+  const [open, setOpen] = useState(false);
+  const showDrawer = () => {
+    setOpen(true);
+  };
+  const onClose = () => {
+    setOpen(false);
+  };
+
+  {
+    /* <Button type="primary" onClick={showDrawer} icon={<PlusOutlined />}>
+      New account
+    </Button> */
+  }
 
   const menu = (
     <Menu>
       <Menu.Item icon={<FolderOutlined />}>
-        <a>添加用例</a>
+        <a onClick={showDrawer}>添加用例</a>
       </Menu.Item>
     </Menu>
   );
@@ -55,6 +69,7 @@ export default ({ loading, treeData }) => {
           ></Card>
         </Col>
       </Row>
+      <PostForm open={open} onClose={onClose} title="添加用例" />
     </Spin>
   );
 };
