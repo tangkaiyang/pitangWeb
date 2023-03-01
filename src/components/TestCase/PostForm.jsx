@@ -3,39 +3,31 @@ import { Button, Col, DatePicker, Drawer, Form, Input, Row, Select, Space } from
 import React, { useState } from 'react';
 const { Option } = Select;
 const PostForm = ({ open, onClose, title }) => {
-  //   const [open, setOpen] = useState(false);
-  //   const showDrawer = () => {
-  //     setOpen(true);
-  //   };
-  //   const onClose = () => {
-  //     setOpen(false);
-  //   };
   return (
     <>
-      {/* <Button type="primary" onClick={showDrawer} icon={<PlusOutlined />}>
-        New account
-      </Button> */}
       <Drawer
-        title={title}
+        title="新增接口测试用例"
         width={720}
         onClose={onClose}
         open={open}
         bodyStyle={{
           paddingBottom: 80,
         }}
-        extra={
+        footer={
           <Space>
             <Button onClick={onClose}>Cancel</Button>
             <Button type="primary">Submit</Button>
           </Space>
         }
+        closable={false}
       >
         <Form layout="vertical" hideRequiredMark>
+          <h3>用例信息</h3>
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
-                name="name"
-                label="Name"
+                name="CaseDir"
+                label="用例目录"
                 rules={[
                   {
                     required: true,
@@ -159,6 +151,7 @@ const PostForm = ({ open, onClose, title }) => {
             </Col>
           </Row>
         </Form>
+        <h3>请求信息</h3>
       </Drawer>
     </>
   );

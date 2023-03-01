@@ -3,10 +3,12 @@ import React, { useState } from 'react';
 import ProfessionalTree from '@/components/Tree/ProfessionalTree';
 import { PlusOutlined, FolderTwoTone, BugTwoTone, FolderOutlined } from '@ant-design/icons';
 import PostForm from '@/components/TestCase/PostForm';
+import { truncate } from 'lodash';
 
 export default ({ loading, treeData }) => {
   const [searchValue, setSearchValue] = useState('');
-  const [open, setOpen] = useState(false);
+  // const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const showDrawer = () => {
     setOpen(true);
   };
@@ -69,7 +71,7 @@ export default ({ loading, treeData }) => {
           ></Card>
         </Col>
       </Row>
-      <PostForm open={open} onClose={onClose} title="添加用例" />
+      <PostForm open={open} onClose={onClose} />
     </Spin>
   );
 };
