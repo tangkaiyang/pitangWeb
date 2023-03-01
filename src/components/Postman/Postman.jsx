@@ -239,6 +239,7 @@ export default () => {
   const STATUS = {
     200: { color: '#67C23A', text: 'OK' },
     401: { color: '#F56C6C', text: 'unauthorized' },
+    400: { color: '#F56C6C', text: 'Bad Request' },
   };
 
   const tabExtra = (response) => {

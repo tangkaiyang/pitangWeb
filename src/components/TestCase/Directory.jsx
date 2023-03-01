@@ -1,34 +1,54 @@
-import { Spin, Row, Col, Card, Dropdown, Menu, Button } from 'antd';
-import React, { useState } from 'react';
+import { Spin, Row, Col, Card, Empty, Result, Dropdown, Menu } from 'antd';
+import React, { useState, useEffect } from 'react';
 import ProfessionalTree from '@/components/Tree/ProfessionalTree';
 import { PlusOutlined, FolderTwoTone, BugTwoTone, FolderOutlined } from '@ant-design/icons';
-import PostForm from '@/components/TestCase/PostForm';
-import { truncate } from 'lodash';
+import CaseForm from '@/components/TestCase/CaseForm';
+import { createTestCase } from '@/services/testcase';
+import auth from '@/utils/auth';
+import TestCaseDetail from '@/components/TestCase/TestCaseDetail';
 
-export default ({ loading, treeData }) => {
+export default ({ loading, treeData, fetchData, projectData, userMap }) => {
   const [searchValue, setSearchValue] = useState('');
-  // const [open, setOpen] = useState(false);
-  const [open, setOpen] = useState(true);
-  const showDrawer = () => {
-    setOpen(true);
-  };
-  const onClose = () => {
-    setOpen(false);
-  };
-
-  {
-    /* <Button type="primary" onClick={showDrawer} icon={<PlusOutlined />}>
-      New account
-    </Button> */
-  }
+  const [drawer, setDrawer] = useState(false);
+  const [caseInfo, setCaseInfo] = useState({ request_type: '1' });
+  const [caseId, setCaseId] = useState(null);
 
   const menu = (
     <Menu>
       <Menu.Item icon={<FolderOutlined />}>
-        <a onClick={showDrawer}>添加用例</a>
+        <a
+          onClick={() => {
+            setDrawer(true);
+          }}
+        >
+          添加用例
+        </a>
       </Menu.Item>
     </Menu>
   );
+
+  const onSelectKeys = (keys) => {
+    if (keys.length > 0 && keys[0].indexOf('case_') > -1) {
+      // 说明是case
+      setCaseId(parseInt(keys[0].split('_')[1], 10));
+    } else {
+      setCaseId(null);
+    }
+  };
+
+  const onCreateCase = async (values) => {
+    const res = await createTestCase({
+      ...values,
+      request_type: parseInt(values.request_type, 10),
+      status: parseInt(values.status, 10),
+      tag: values.tag !== undefined ? values.tag.join(',') : null,
+      project_id: projectData.id,
+    });
+    if (auth.response(res, true)) {
+      setDrawer(false);
+      await fetchData();
+    }
+  };
 
   const iconMap = (key) => {
     if (key.indexOf('cat') > -1) {
@@ -49,14 +69,16 @@ export default ({ loading, treeData }) => {
 
   return (
     <Spin spinning={loading} tip="努力加载中">
+      <CaseForm data={caseInfo} modal={drawer} setModal={setDrawer} onFinish={onCreateCase} />
       <Row gutter={[8, 8]}>
-        <Col span={7}>
+        <Col span={6}>
           <Card bodyStyle={{ padding: 12, minHeight: 500, maxHeight: 500, overflowY: 'auto' }}>
             <ProfessionalTree
               gData={treeData}
               checkable={false}
               AddButton={AddButton}
               searchValue={searchValue}
+              onSelect={onSelectKeys}
               setSearchValue={setSearchValue}
               iconMap={iconMap}
               suffixMap={() => {
@@ -65,13 +87,16 @@ export default ({ loading, treeData }) => {
             />
           </Card>
         </Col>
-        <Col span={17}>
-          <Card
-            bodyStyle={{ padding: 12, minHeight: 500, maxHeight: 500, overflowY: 'auto' }}
-          ></Card>
+        <Col span={18}>
+          <Card bodyStyle={{ padding: 12, minHeight: 500, maxHeight: 500, overflowY: 'auto' }}>
+            {caseId === null ? (
+              <Result title="请选择左侧用例" status="info" />
+            ) : (
+              <TestCaseDetail caseId={caseId} userMap={userMap} />
+            )}
+          </Card>
         </Col>
       </Row>
-      <PostForm open={open} onClose={onClose} />
     </Spin>
   );
 };
