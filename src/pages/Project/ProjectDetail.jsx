@@ -13,7 +13,6 @@ import Directory from '@/components/TestCase/Directory';
 const { TabPane } = Tabs;
 
 export default () => {
-  debugger;
   const params = useParams();
   const projectId = params.id;
   const [projectData, setProjectData] = useState({});

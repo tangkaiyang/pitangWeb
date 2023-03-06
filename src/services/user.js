@@ -17,7 +17,7 @@ export async function listUsers(params) {
     headers: auth.headers(),
   });
   if (auth.response(res)) {
-    return res;
+    return res.data;
   }
   return [];
 }
