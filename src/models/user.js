@@ -19,7 +19,7 @@ const UserModel = {
       const token = localStorage.getItem('pitangToken');
       const userInfo = localStorage.getItem('pitangUser');
       if (!token || !userInfo) {
-        history.pushState('/user/login');
+        history.pushState(null, 'Login', '/user/login');
         return;
       }
       // 反序列化:string->user对象
