@@ -17,3 +17,11 @@ export async function queryTestCase(params) {
     headers: auth.headers(),
   });
 }
+
+export async function updateTestCase(params) {
+  return request(`${CONFIG.URL}/testcase/update`, {
+    method: 'POST',
+    data: params,
+    headers: auth.headers(),
+  });
+}
