@@ -1,4 +1,4 @@
-import getComponent from '@/components/PityForm';
+import getComponent from '@/components/PitangForm';
 import PostmanForm from '@/components/Postman/PostmanForm';
 import { Form, Row, Col } from 'antd';
 import styles from './CaseDetail.less';
