@@ -55,6 +55,12 @@ export default [
                 component: './Project/ProjectDetail',
               },
               {
+                path: '/environment',
+                name: '环境配置',
+                icon: 'book',
+                component: './Environment/Environment',
+              },
+              {
                 path: '/admin',
                 name: 'admin',
                 icon: 'crown',
