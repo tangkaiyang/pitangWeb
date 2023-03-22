@@ -61,6 +61,12 @@ export default [
                 component: './Environment/Environment',
               },
               {
+                path: '/globalconfig',
+                name: '全局变量',
+                icon: 'book',
+                component: './GlobalConfig/GlobalConfig',
+              },
+              {
                 path: '/admin',
                 name: 'admin',
                 icon: 'crown',
