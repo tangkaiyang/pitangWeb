@@ -58,6 +58,11 @@ export default () => {
     {
       title: '环境',
       dataIndex: 'id',
+      render: (text) => (
+        <Tag color="blue" key={text}>
+          {text}
+        </Tag>
+      ),
     },
     {
       title: '类型',
