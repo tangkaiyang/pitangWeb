@@ -21,6 +21,8 @@ import {
   deleteGlobalConfig,
 } from '@/services/global_config';
 import { PageContainer } from '@ant-design/pro-layout';
+import { listUsers } from '@/services/user';
+import { listEnvironments } from '@/services/environment';
 
 const { Option } = Select;
 const { Search } = Input;
@@ -31,6 +33,14 @@ const GlobalVariables = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [editingVariable, setEditingVariable] = useState(null);
   const [searchText, setSearchText] = useState('');
+  const [users, setUsers] = useState([]);
+  const [envs, setEnvs] = useState([]);
+
+  const keyTypes = {
+    0: 'String',
+    1: 'Json',
+    2: 'Yaml',
+  };
 
   useEffect(() => {
     fetchVariables();
@@ -41,10 +51,33 @@ const GlobalVariables = () => {
       const response = await listGlobalConfigs(searchText);
       setVariables(response.data);
     } catch (error) {
-      message.error('Failed to fetch global variables.');
+      message.error('获取全局变量失败');
     }
   };
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
+  const fetchUsers = async () => {
+    try {
+      const response = await listUsers();
+      setUsers(response.data);
+    } catch (error) {
+      message.error('获取用户失败');
+    }
+  };
+  useEffect(() => {
+    fetchEnvs();
+  }, []);
+
+  const fetchEnvs = async () => {
+    try {
+      const response = await listEnvironments();
+      setEnvs(response.data);
+    } catch (error) {
+      message.error('获取环境列表失败');
+    }
+  };
   const handleAddVariable = () => {
     setEditingVariable(null);
     form.resetFields();
@@ -91,13 +124,22 @@ const GlobalVariables = () => {
     setSearchText(value);
   };
 
+  // 根据env_id获取name
+  const getNameByEnvId = (env_id) => {
+    console.log(env_id);
+    console.log(envs);
+    const env = envs.find((env) => env.id === env_id);
+    console.log(env);
+    // return env.name;
+  };
+
   const columns = [
     {
       title: '环境',
       dataIndex: 'env_id',
       render: (text) => (
         <Tag color="grey" key={text}>
-          {text}
+          {getNameByEnvId(text)}
         </Tag>
       ),
     },
@@ -106,7 +148,7 @@ const GlobalVariables = () => {
       dataIndex: 'key_type',
       render: (text) => (
         <Tag color="green" key={text}>
-          {text}
+          {keyTypes[text]}
         </Tag>
       ),
     },
@@ -132,18 +174,18 @@ const GlobalVariables = () => {
       render: (_, variable) => (
         <Space>
           <Button icon={<EditOutlined />} onClick={() => handleEditVariable(variable)}>
-            Edit
+            编辑
           </Button>
           <Button
             icon={<DeleteOutlined />}
             onClick={() =>
               Modal.confirm({
-                title: 'Are you sure you want to delete this global variable?',
+                title: '确定删除?',
                 onOk: () => handleDeleteVariable(variable),
               })
             }
           >
-            Delete
+            删除
           </Button>
         </Space>
       ),
@@ -156,7 +198,7 @@ const GlobalVariables = () => {
         <Row justify="space-between" align="middle" style={{ marginBottom: 16 }}>
           <Col>
             <Button type="primary" icon={<PlusOutlined />} onClick={handleAddVariable}>
-              Add Variable
+              新增全局变量
             </Button>
           </Col>
           <Col>
@@ -172,7 +214,7 @@ const GlobalVariables = () => {
         </Row>
         <Table columns={columns} dataSource={variables} rowKey="id" />
         <Modal
-          title={editingVariable ? 'Edit Global Variable' : 'Add Global Variable'}
+          title={editingVariable ? '编辑全局变量' : '新增全局变量'}
           open={modalVisible}
           onCancel={() => setModalVisible(false)}
           onOk={handleSaveVariable}
@@ -182,7 +224,7 @@ const GlobalVariables = () => {
             <Form.Item name="env_id" label="环境" rules={[{ required: true }]}>
               <Input />
             </Form.Item>
-            <Form.Item name="type" label="类型" rules={[{ required: true }]}>
+            <Form.Item name="key_type" label="类型" rules={[{ required: true }]}>
               <Select>
                 <Option value="0">String</Option>
                 <Option value="1">Json</Option>
