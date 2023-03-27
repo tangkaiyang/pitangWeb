@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   Button,
   Card,
@@ -12,6 +12,7 @@ import {
   Space,
   Table,
   Tag,
+  Switch,
 } from 'antd';
 import { DeleteOutlined, EditOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import {
@@ -23,6 +24,7 @@ import {
 import { PageContainer } from '@ant-design/pro-layout';
 import { listUsers } from '@/services/user';
 import { listEnvironments } from '@/services/environment';
+import CodeEditor from '@/components/Postman/CodeEditor';
 
 const { Option } = Select;
 const { Search } = Input;
@@ -35,16 +37,40 @@ const GlobalVariables = () => {
   const [searchText, setSearchText] = useState('');
   const [users, setUsers] = useState([]);
   const [envs, setEnvs] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const keyTypes = {
     0: 'String',
     1: 'Json',
     2: 'Yaml',
   };
+  useEffect(() => {
+    async function fetchUsers() {
+      try {
+        const resUsers = await listUsers();
+        setUsers(resUsers);
+      } catch (error) {
+        message.error('获取用户失败');
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchUsers();
+  }, []);
 
   useEffect(() => {
-    fetchVariables();
-  }, [searchText]);
+    async function fetchEnvs() {
+      try {
+        const response = await listEnvironments();
+        setEnvs(response.data);
+      } catch (error) {
+        message.error('获取环境列表失败');
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchEnvs();
+  }, []);
 
   const fetchVariables = async () => {
     try {
@@ -55,29 +81,12 @@ const GlobalVariables = () => {
     }
   };
   useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  const fetchUsers = async () => {
-    try {
-      const response = await listUsers();
-      setUsers(response.data);
-    } catch (error) {
-      message.error('获取用户失败');
+    if (!loading) {
+      // 确保已经获取到用户和环境信息后再获取全局变量
+      fetchVariables();
     }
-  };
-  useEffect(() => {
-    fetchEnvs();
-  }, []);
+  }, [searchText, loading]);
 
-  const fetchEnvs = async () => {
-    try {
-      const response = await listEnvironments();
-      setEnvs(response.data);
-    } catch (error) {
-      message.error('获取环境列表失败');
-    }
-  };
   const handleAddVariable = () => {
     setEditingVariable(null);
     form.resetFields();
@@ -91,22 +100,22 @@ const GlobalVariables = () => {
   };
 
   const handleSaveVariable = async () => {
+    const values = await form.validateFields();
+    const newVariable = {
+      ...editingVariable,
+      ...values,
+    };
     try {
-      const values = await form.validateFields();
-      const newVariable = {
-        ...editingVariable,
-        ...values,
-      };
       if (editingVariable) {
-        await updateGlobalConfig(editingVariable.id, newVariable);
+        await updateGlobalConfig({ id: editingVariable.id, ...newVariable });
       } else {
         await addGlobalConfig(newVariable);
       }
       setModalVisible(false);
       fetchVariables();
-      message.success('Global variable saved successfully.');
+      message.success('保存成功');
     } catch (error) {
-      message.error('Failed to save global variable.');
+      message.error('保存失败');
     }
   };
 
@@ -114,83 +123,107 @@ const GlobalVariables = () => {
     try {
       await deleteGlobalConfig(variable.id);
       fetchVariables();
-      message.success('Global variable deleted successfully.');
+      message.success('删除成功');
     } catch (error) {
-      message.error('Failed to delete global variable.');
+      message.error('删除失败');
     }
   };
 
   const handleSearch = async (value) => {
     setSearchText(value);
   };
+  const getNameByEnvId = useMemo(
+    () => (env_id) => {
+      const env = envs.find((env) => env.id === env_id);
+      // 异步,容错处理
+      return env ? env.name : '';
+    },
+    [envs],
+  );
+  const getNameByUserId = useMemo(
+    () => (user_id) => {
+      console.log(user_id);
+      console.log(users);
+      const user = users.find((user) => user.id === user_id);
+      // 异步,容错处理
+      return user ? user.name : '';
+    },
+    [users],
+  );
 
-  // 根据env_id获取name
-  const getNameByEnvId = (env_id) => {
-    console.log(env_id);
-    console.log(envs);
-    const env = envs.find((env) => env.id === env_id);
-    console.log(env);
-    // return env.name;
-  };
-
-  const columns = [
-    {
-      title: '环境',
-      dataIndex: 'env_id',
-      render: (text) => (
-        <Tag color="grey" key={text}>
-          {getNameByEnvId(text)}
-        </Tag>
-      ),
-    },
-    {
-      title: '类型',
-      dataIndex: 'key_type',
-      render: (text) => (
-        <Tag color="green" key={text}>
-          {keyTypes[text]}
-        </Tag>
-      ),
-    },
-    {
-      title: 'key',
-      dataIndex: 'key',
-    },
-    {
-      title: 'value',
-      dataIndex: 'value',
-    },
-    {
-      title: '是否可用',
-      dataIndex: 'enable',
-    },
-    {
-      title: '创建人',
-      dataIndex: 'create_user',
-    },
-
-    {
-      title: '操作',
-      render: (_, variable) => (
-        <Space>
-          <Button icon={<EditOutlined />} onClick={() => handleEditVariable(variable)}>
-            编辑
-          </Button>
-          <Button
-            icon={<DeleteOutlined />}
-            onClick={() =>
-              Modal.confirm({
-                title: '确定删除?',
-                onOk: () => handleDeleteVariable(variable),
+  const columns = useMemo(
+    () => [
+      {
+        title: '环境',
+        dataIndex: 'env_id',
+        render: (text) => (
+          <Tag color="grey" key={text}>
+            {getNameByEnvId(text)}
+          </Tag>
+        ),
+      },
+      {
+        title: '类型',
+        dataIndex: 'key_type',
+        render: (text) => (
+          <Tag color="green" key={text}>
+            {keyTypes[text]}
+          </Tag>
+        ),
+      },
+      {
+        title: 'key',
+        dataIndex: 'key',
+      },
+      {
+        title: 'value',
+        dataIndex: 'value',
+      },
+      {
+        title: '是否可用',
+        dataIndex: 'enable',
+        render: (text, record) => (
+          <Switch
+            checked={text}
+            onChange={(checked) =>
+              updateGlobalConfig({ id: record.id, enable: checked ? 1 : 0 }).then(() => {
+                // 成功更新后刷新全局变量列表
+                fetchVariables();
               })
             }
-          >
-            删除
-          </Button>
-        </Space>
-      ),
-    },
-  ];
+          />
+        ),
+      },
+      {
+        title: '创建人',
+        dataIndex: 'create_user',
+        render: (text) => getNameByUserId(text),
+      },
+
+      {
+        title: '操作',
+        render: (_, variable) => (
+          <Space>
+            <Button icon={<EditOutlined />} onClick={() => handleEditVariable(variable)}>
+              编辑
+            </Button>
+            <Button
+              icon={<DeleteOutlined />}
+              onClick={() =>
+                Modal.confirm({
+                  title: '确定删除?',
+                  onOk: () => handleDeleteVariable(variable),
+                })
+              }
+            >
+              删除
+            </Button>
+          </Space>
+        ),
+      },
+    ],
+    [getNameByEnvId, getNameByUserId, keyTypes, handleDeleteVariable, handleEditVariable],
+  );
 
   return (
     <PageContainer title={false}>
@@ -220,25 +253,34 @@ const GlobalVariables = () => {
           onOk={handleSaveVariable}
           destroyOnClose
         >
-          <Form form={form} initialValues={{ enabled: true }}>
+          <Form form={form} initialValues={{ enabled: true }} labelCol={{ span: 4 }}>
             <Form.Item name="env_id" label="环境" rules={[{ required: true }]}>
               <Input />
             </Form.Item>
             <Form.Item name="key_type" label="类型" rules={[{ required: true }]}>
               <Select>
-                <Option value="0">String</Option>
-                <Option value="1">Json</Option>
-                <Option value="2">Yaml</Option>
+                {Object.entries(keyTypes).map(([value, label]) => (
+                  <Option key={value} value={value}>
+                    {label}
+                  </Option>
+                ))}
               </Select>
             </Form.Item>
             <Form.Item name="key" label="Key" rules={[{ required: true }]}>
               <Input />
             </Form.Item>
             <Form.Item name="value" label="Value" rules={[{ required: true }]}>
-              <Input />
+              <CodeEditor
+                language={() => {
+                  keyTypes(value);
+                }}
+                theme="vs-dark"
+                height={250}
+                options={{ lineNumbers: 'off' }}
+              />
             </Form.Item>
             <Form.Item name="enable" label="是否启用" valuePropName="checked">
-              <Input type="checkbox" />
+              <Switch />
             </Form.Item>
           </Form>
         </Modal>
