@@ -255,7 +255,13 @@ const GlobalVariables = () => {
         >
           <Form form={form} initialValues={{ enabled: true }} labelCol={{ span: 4 }}>
             <Form.Item name="env_id" label="环境" rules={[{ required: true }]}>
-              <Input />
+              <Select>
+                {Object.entries(envs).map(([value, label]) => (
+                  <Option key={value} value={value}>
+                    {label}
+                  </Option>
+                ))}
+              </Select>
             </Form.Item>
             <Form.Item name="key_type" label="类型" rules={[{ required: true }]}>
               <Select>
