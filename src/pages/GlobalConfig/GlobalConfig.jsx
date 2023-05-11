@@ -253,12 +253,12 @@ const GlobalVariables = () => {
           onOk={handleSaveVariable}
           destroyOnClose
         >
-          <Form form={form} initialValues={{ enabled: true }} labelCol={{ span: 4 }}>
+          <Form form={form} initialValues={{ enable: true }} labelCol={{ span: 4 }}>
             <Form.Item name="env_id" label="环境" rules={[{ required: true }]}>
               <Select>
-                {Object.entries(envs).map(([value, label]) => (
-                  <Option key={value} value={value}>
-                    {label}
+                {envs.map(({ id, name }) => (
+                  <Option key={id} value={name}>
+                    {name}
                   </Option>
                 ))}
               </Select>
