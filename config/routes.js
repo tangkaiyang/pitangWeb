@@ -67,6 +67,12 @@ export default [
                 component: './GlobalConfig/GlobalConfig',
               },
               {
+                path: '/minMap',
+                name: '思维导图',
+                icon: 'book',
+                component: './MinMap/MinMap',
+              },
+              {
                 path: '/admin',
                 name: 'admin',
                 icon: 'crown',
