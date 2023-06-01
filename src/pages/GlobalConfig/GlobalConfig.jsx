@@ -38,6 +38,7 @@ const GlobalVariables = () => {
   const [users, setUsers] = useState([]);
   const [envs, setEnvs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [value, setValue] = useState('');
 
   const keyTypes = {
     0: 'String',
@@ -283,6 +284,8 @@ const GlobalVariables = () => {
                 theme="vs-dark"
                 height={250}
                 options={{ lineNumbers: 'off' }}
+                value={value}
+                setValue={setValue}
               />
             </Form.Item>
             <Form.Item name="enable" label="是否启用" valuePropName="checked">
