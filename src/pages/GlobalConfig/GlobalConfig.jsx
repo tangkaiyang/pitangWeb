@@ -279,7 +279,7 @@ const GlobalVariables = () => {
             <Form.Item name="value" label="Value" rules={[{ required: true }]}>
               <CodeEditor
                 language={() => {
-                  keyTypes(value);
+                  keyTypes[value];
                 }}
                 theme="vs-dark"
                 height={250}
