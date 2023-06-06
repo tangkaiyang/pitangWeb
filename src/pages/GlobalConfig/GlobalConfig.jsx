@@ -39,7 +39,15 @@ const GlobalVariables = () => {
   const [envs, setEnvs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [value, setValue] = useState('');
-
+  const getType = () => {
+    if (language === 1) {
+      return 'json';
+    }
+    if (language === 2) {
+      return 'yaml';
+    }
+    return 'text';
+  };
   const keyTypes = {
     0: 'String',
     1: 'Json',
@@ -278,14 +286,10 @@ const GlobalVariables = () => {
             </Form.Item>
             <Form.Item name="value" label="Value" rules={[{ required: true }]}>
               <CodeEditor
-                language={() => {
-                  keyTypes[value];
-                }}
+                language={getType()}
                 theme="vs-dark"
                 height={250}
                 options={{ lineNumbers: 'off' }}
-                value={value}
-                setValue={setValue}
               />
             </Form.Item>
             <Form.Item name="enable" label="是否启用" valuePropName="checked">
