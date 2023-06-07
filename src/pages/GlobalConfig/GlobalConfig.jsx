@@ -104,7 +104,7 @@ const GlobalVariables = () => {
 
   const handleEditVariable = (variable) => {
     setEditingVariable(variable);
-    form.setFieldsValue(variable);
+    form.setFieldsValue({ ...variable, key_type: variable.key_type.toString() });
     setModalVisible(true);
   };
 
