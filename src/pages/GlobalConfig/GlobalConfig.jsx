@@ -38,7 +38,7 @@ const GlobalVariables = () => {
   const [users, setUsers] = useState([]);
   const [envs, setEnvs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [value, setValue] = useState('');
+  const [language, setLanguage] = useState(1);
   const getType = () => {
     if (language === 1) {
       return 'json';
@@ -266,14 +266,14 @@ const GlobalVariables = () => {
             <Form.Item name="env_id" label="环境" rules={[{ required: true }]}>
               <Select>
                 {envs.map(({ id, name }) => (
-                  <Option key={id} value={name}>
+                  <Option key={id} value={id}>
                     {name}
                   </Option>
                 ))}
               </Select>
             </Form.Item>
             <Form.Item name="key_type" label="类型" rules={[{ required: true }]}>
-              <Select>
+              <Select onChange={(value) => setLanguage(value)}>
                 {Object.entries(keyTypes).map(([value, label]) => (
                   <Option key={value} value={value}>
                     {label}
