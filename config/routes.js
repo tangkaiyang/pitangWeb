@@ -50,6 +50,12 @@ export default [
                 component: './Project/Project',
               },
               {
+                path: '/tools',
+                name: '工具箱',
+                icon: 'tool',
+                component: './Tools/Tools',
+              },
+              {
                 path: '/project/:id',
                 hideInMenu: true,
                 component: './Project/ProjectDetail',
