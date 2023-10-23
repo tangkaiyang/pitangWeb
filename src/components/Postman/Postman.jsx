@@ -364,7 +364,7 @@ export default () => {
                         <Col span={24}>
                           <Card bodyStyle={{ padding: 0 }}>
                             {/* 注意入参!!! */}
-                            <CodeEditor value={body} setValue={setBody} height="20vh" />
+                            <CodeEditor value={body} onChange={setBody} height="20vh" />
                           </Card>
                         </Col>
                       </Row>
