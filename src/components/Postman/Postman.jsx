@@ -274,155 +274,175 @@ export default () => {
 
   return (
     <Card>
-      <Row gutter={[8, 8]}>
-        <Col span={18}>
-          <Input
-            size="large"
-            addonBefore={selectBefore}
-            placeholder="请输入要请求的url"
-            // 绑定值才能更新QAQ
-            value={url}
-            // defaultValue={() => "http://baidu.com?a=1&b=2"}
-            // 用标签的值更新
-            onChange={(e) => {
-              setUrl(e.target.value);
-              splitUrl(e.target.value);
-            }}
-          />
+      <Row gutter={16}>
+        <Col span={4}>
+          <h2>请求历史</h2>
         </Col>
-        <Col span={6}>
-          <Button
-            onClick={onRequest}
-            loading={loading}
-            type="primary"
-            size="large"
-            style={{ marginRight: 16, float: 'right' }}
-          >
-            <SendOutlined />
-            Send
-          </Button>
+        <Col span={20}>
+          <Col>
+            <Row gutter={[8, 8]}>
+              <Col span={18}>
+                <Input
+                  size="large"
+                  addonBefore={selectBefore}
+                  placeholder="请输入要请求的url"
+                  // 绑定值才能更新QAQ
+                  value={url}
+                  // defaultValue={() => "http://baidu.com?a=1&b=2"}
+                  // 用标签的值更新
+                  onChange={(e) => {
+                    setUrl(e.target.value);
+                    splitUrl(e.target.value);
+                  }}
+                />
+              </Col>
+              <Col span={6}>
+                <Button
+                  onClick={onRequest}
+                  loading={loading}
+                  type="primary"
+                  size="large"
+                  style={{ marginRight: 16, float: 'right' }}
+                >
+                  <SendOutlined />
+                  Send
+                </Button>
+              </Col>
+            </Row>
+            <Row style={{ marginTop: 8 }} gutter={[18, 8]}>
+              <Col>
+                <Tabs
+                  defaultActiveKey="1"
+                  items={[
+                    {
+                      label: `Params`,
+                      key: '1',
+                      children: (
+                        <EditableTable
+                          columns={columns(`params`)}
+                          title="Query Params"
+                          dataSource={paramsData}
+                          setDataSource={setParamsData}
+                          extra={joinUrl}
+                          editableKeys={editableKeys}
+                          setEditableRowKeys={setEditableRowKeys}
+                        />
+                      ),
+                    },
+                    {
+                      label: `Headers`,
+                      key: '2',
+                      children: (
+                        <EditableTable
+                          columns={columns('headers')}
+                          title="Headers"
+                          dataSource={headers}
+                          setDataSource={setHeaders}
+                          editableKeys={headersKeys}
+                          setEditableRowKeys={setHeadersKeys}
+                        />
+                      ),
+                    },
+                    {
+                      label: `Body`,
+                      key: '3',
+                      children: (
+                        <>
+                          <Row>
+                            <Radio.Group
+                              value={bodyType}
+                              onChange={(e) => setBodyType(e.target.value)}
+                            >
+                              <Radio value="none">none</Radio>
+                              <Radio value="form-data">form-data</Radio>
+                              <Radio value="x-www-form-urlencoded">x-www-form-urlencoded</Radio>
+                              <Radio value="raw">raw</Radio>
+                              <Radio value="binary">binary</Radio>
+                              <Radio value="GraphQL">GraphQL</Radio>
+                            </Radio.Group>
+                            {bodyType === 'raw' ? (
+                              <Dropdown
+                                style={{ marginLeft: 8 }}
+                                overlay={menu}
+                                trigger={['click']}
+                              >
+                                <a onClick={(e) => e.preventDefault()}>
+                                  {rawType} <DownOutlined />
+                                </a>
+                              </Dropdown>
+                            ) : null}
+                          </Row>
+                          {bodyType !== 'none' ? (
+                            <Row style={{ marginTop: 12 }}>
+                              <Col span={24}>
+                                <Card bodyStyle={{ padding: 0 }}>
+                                  {/* 注意入参!!! */}
+                                  <CodeEditor value={body} onChange={setBody} height="20vh" />
+                                </Card>
+                              </Col>
+                            </Row>
+                          ) : (
+                            <div
+                              style={{ height: '20vh', lineHeight: '20vh', textAlign: 'center' }}
+                            >
+                              This request does not have a body
+                            </div>
+                          )}
+                        </>
+                      ),
+                    },
+                  ]}
+                />
+              </Col>
+            </Row>
+            <Row gutter={[8, 8]}>
+              {Object.keys(response).length === 0 ? null : (
+                <Tabs
+                  style={{ width: '100%' }}
+                  tabBarExtraContent={tabExtra(response)}
+                  items={[
+                    {
+                      label: 'Body',
+                      key: '1',
+                      children: (
+                        <CodeEditor
+                          value={
+                            response.response ? JSON.stringify(response.response, null, 2) : ''
+                          }
+                          height="30vh"
+                        />
+                      ),
+                    },
+                    {
+                      label: 'Cookie',
+                      key: '2',
+                      children: (
+                        <Table
+                          columns={resColumns}
+                          dataSource={toTable('cookies')}
+                          size="small"
+                          pagination={false}
+                        />
+                      ),
+                    },
+                    {
+                      label: 'Headers',
+                      key: '3',
+                      children: (
+                        <Table
+                          columns={resColumns}
+                          dataSource={toTable('response_header')}
+                          size="small"
+                          pagination={false}
+                        />
+                      ),
+                    },
+                  ]}
+                />
+              )}
+            </Row>
+          </Col>
         </Col>
-      </Row>
-      <Row style={{ marginTop: 8 }} gutter={[18, 8]}>
-        <Col>
-          <Tabs
-            defaultActiveKey="1"
-            items={[
-              {
-                label: `Params`,
-                key: '1',
-                children: (
-                  <EditableTable
-                    columns={columns(`params`)}
-                    title="Query Params"
-                    dataSource={paramsData}
-                    setDataSource={setParamsData}
-                    extra={joinUrl}
-                    editableKeys={editableKeys}
-                    setEditableRowKeys={setEditableRowKeys}
-                  />
-                ),
-              },
-              {
-                label: `Headers`,
-                key: '2',
-                children: (
-                  <EditableTable
-                    columns={columns('headers')}
-                    title="Headers"
-                    dataSource={headers}
-                    setDataSource={setHeaders}
-                    editableKeys={headersKeys}
-                    setEditableRowKeys={setHeadersKeys}
-                  />
-                ),
-              },
-              {
-                label: `Body`,
-                key: '3',
-                children: (
-                  <>
-                    <Row>
-                      <Radio.Group value={bodyType} onChange={(e) => setBodyType(e.target.value)}>
-                        <Radio value="none">none</Radio>
-                        <Radio value="form-data">form-data</Radio>
-                        <Radio value="x-www-form-urlencoded">x-www-form-urlencoded</Radio>
-                        <Radio value="raw">raw</Radio>
-                        <Radio value="binary">binary</Radio>
-                        <Radio value="GraphQL">GraphQL</Radio>
-                      </Radio.Group>
-                      {bodyType === 'raw' ? (
-                        <Dropdown style={{ marginLeft: 8 }} overlay={menu} trigger={['click']}>
-                          <a onClick={(e) => e.preventDefault()}>
-                            {rawType} <DownOutlined />
-                          </a>
-                        </Dropdown>
-                      ) : null}
-                    </Row>
-                    {bodyType !== 'none' ? (
-                      <Row style={{ marginTop: 12 }}>
-                        <Col span={24}>
-                          <Card bodyStyle={{ padding: 0 }}>
-                            {/* 注意入参!!! */}
-                            <CodeEditor value={body} onChange={setBody} height="20vh" />
-                          </Card>
-                        </Col>
-                      </Row>
-                    ) : (
-                      <div style={{ height: '20vh', lineHeight: '20vh', textAlign: 'center' }}>
-                        This request does not have a body
-                      </div>
-                    )}
-                  </>
-                ),
-              },
-            ]}
-          />
-        </Col>
-      </Row>
-      <Row gutter={[8, 8]}>
-        {Object.keys(response).length === 0 ? null : (
-          <Tabs
-            style={{ width: '100%' }}
-            tabBarExtraContent={tabExtra(response)}
-            items={[
-              {
-                label: 'Body',
-                key: '1',
-                children: (
-                  <CodeEditor
-                    value={response.response ? JSON.stringify(response.response, null, 2) : ''}
-                    height="30vh"
-                  />
-                ),
-              },
-              {
-                label: 'Cookie',
-                key: '2',
-                children: (
-                  <Table
-                    columns={resColumns}
-                    dataSource={toTable('cookies')}
-                    size="small"
-                    pagination={false}
-                  />
-                ),
-              },
-              {
-                label: 'Headers',
-                key: '3',
-                children: (
-                  <Table
-                    columns={resColumns}
-                    dataSource={toTable('response_header')}
-                    size="small"
-                    pagination={false}
-                  />
-                ),
-              },
-            ]}
-          />
-        )}
       </Row>
     </Card>
   );
