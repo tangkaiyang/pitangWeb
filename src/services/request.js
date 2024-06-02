@@ -3,7 +3,7 @@ import { CONFIG } from '@/consts/config';
 import auth from '@/utils/auth';
 
 export async function httpRequest(params) {
-  return request(`${CONFIG.URL}/request/http`, {
+  return request(`${CONFIG.URL}/web/debug/http`, {
     method: 'POST',
     data: params,
     headers: auth.headers(),

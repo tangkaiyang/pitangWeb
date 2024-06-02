@@ -1,6 +1,6 @@
 export const CONFIG = {
   // URL: 'http://47.112.32.195:7777',
-  URL: 'http://localhost:7777',
+  URL: 'http://localhost:8083',
   ROLE: {
     0: 'user',
     1: 'admin',
@@ -39,11 +39,11 @@ export const CONFIG = {
     3: 'Dubbo',
   },
   CASE_TAG: {
-    "P0": "magenta",
-    "P1": "red",
-    "P2": "volcano",
-    "P3": "orange",
-    "P4": "green",
+    P0: 'magenta',
+    P1: 'red',
+    P2: 'volcano',
+    P3: 'orange',
+    P4: 'green',
   },
   CASE_BADGE: {
     1: {
