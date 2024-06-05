@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Card,
   Col,
@@ -36,6 +36,12 @@ export default () => {
   // headers相关变量
   const [headers, setHeaders] = useState([]);
   const [headersKeys, setHeadersKeys] = useState(() => headers.map((item) => item.id));
+
+  const [requestHistory, setRequestHistory] = useState([]);
+  useEffect(() => {
+    const loadedHistory = JSON.parse(localStorage.getItem('requestHistory') || '[]');
+    setRequestHistory(loadedHistory);
+  }, []);
 
   const onClickMenu = (key) => {
     setRawType(key);
@@ -216,23 +222,53 @@ export default () => {
     }
     const res = await httpRequest(params);
     setLoading(false);
-    if (res.code !== 0) {
+    if (res.code || res.code !== 0) {
       notification.error(res.msg || '网络开小差了');
       return;
     }
     if (auth.response(res, true)) {
       setResponse(res.data);
+      saveRequestHistory(params, res.data); // 保存请求历史
     }
     Modal.info({
       title: '返回结果',
       content: (
-        <pre>
-          {typeof res.data.response === 'string'
-            ? res.data.response
-            : JSON.stringify(res.data.response, null, 2)}
-        </pre>
+        <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
+          <pre>
+            {typeof res.data.response === 'string'
+              ? res.data.response
+              : JSON.stringify(res.data.response, null, 2)}
+          </pre>
+        </div>
       ),
     });
+  };
+
+  const saveRequestHistory = (request, response) => {
+    const history = JSON.parse(localStorage.getItem('requestHistory') || '[]');
+    const newEntry = {
+      timestamp: new Date().toISOString(),
+      method: request.method,
+      url: request.url,
+      body: request.body,
+      headers: request.headers,
+      response: response,
+    };
+    history.unshift(newEntry); // 将新记录添加到数组开头
+    if (history.length > 10) history.pop(); // 保持历史记录不超过10条
+    localStorage.setItem('requestHistory', JSON.stringify(history));
+  };
+
+  // 渲染历史记录为表格或其他组件
+  const renderHistory = () => {
+    return requestHistory.map((entry, index) => (
+      <div key={index}>
+        <p>{entry.timestamp}</p>
+        <p>
+          {entry.method} {entry.url}
+        </p>
+      </div>
+    ));
   };
 
   // http状态码组件
@@ -277,6 +313,7 @@ export default () => {
       <Row gutter={16}>
         <Col span={4}>
           <h2>请求历史</h2>
+          {renderHistory()}
         </Col>
         <Col span={20}>
           <Col>
